@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="520" viewBox="0 0 980 520">
+  <defs>
+    <style>
+      .bg { fill: #f6f8fb; }
+      .card { fill: #fff; stroke: rgba(0,0,0,.08); stroke-width: 1; }
+      .bar { fill: #2387bd; }
+      .title { font: 700 24px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; fill: #1c1e21; }
+      .label { font: 650 17px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; fill: #1c1e21; }
+      .desc { font: 13px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; fill: #6b7280; }
+      .num { font: 500 24px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; fill: #fff; }
+      .whiteStroke { fill: none; stroke: #fff; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+      .whiteStrokeLight { fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+      .whiteFill { fill: #fff; }
+      .blackStroke { fill: none; stroke: #111827; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+      .blackStrokeLight { fill: none; stroke: #111827; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+      .blackFill { fill: #111827; }
+      .hint { font: 12px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; fill: #94a3b8; }
+    </style>
+
+    <symbol id="withDots" viewBox="0 0 18 18">
+      <circle class="whiteFill" cx="4.2" cy="6" r="1.3"/>
+      <circle class="whiteFill" cx="4.2" cy="12" r="1.3"/>
+      <path class="whiteStroke" d="M7 4.6h4.6a3.1 3.1 0 0 1 0 6.2H9.2v2.6"/>
+      <path class="whiteStroke" d="M9.2 10.8H7"/>
+    </symbol>
+    <symbol id="withDotsBlack" viewBox="0 0 18 18">
+      <circle class="blackFill" cx="4.2" cy="6" r="1.3"/>
+      <circle class="blackFill" cx="4.2" cy="12" r="1.3"/>
+      <path class="blackStroke" d="M7 4.6h4.6a3.1 3.1 0 0 1 0 6.2H9.2v2.6"/>
+      <path class="blackStroke" d="M9.2 10.8H7"/>
+    </symbol>
+
+    <symbol id="noDotsCentered" viewBox="0 0 18 18">
+      <path class="whiteStroke" d="M5.2 4.6h5.4a3.1 3.1 0 0 1 0 6.2H7.4v2.6"/>
+      <path class="whiteStroke" d="M7.4 10.8H5.2"/>
+    </symbol>
+    <symbol id="noDotsCenteredBlack" viewBox="0 0 18 18">
+      <path class="blackStroke" d="M5.2 4.6h5.4a3.1 3.1 0 0 1 0 6.2H7.4v2.6"/>
+      <path class="blackStroke" d="M7.4 10.8H5.2"/>
+    </symbol>
+
+    <symbol id="noDotsMonoline" viewBox="0 0 18 18">
+      <path class="whiteStrokeLight" d="M5.1 4.7h5.5a3.1 3.1 0 0 1 0 6.2H7.5v2.4"/>
+      <path class="whiteStrokeLight" d="M7.5 10.9H5.1"/>
+      <path class="whiteStrokeLight" d="M5.1 4.7v8.6"/>
+    </symbol>
+    <symbol id="noDotsMonolineBlack" viewBox="0 0 18 18">
+      <path class="blackStrokeLight" d="M5.1 4.7h5.5a3.1 3.1 0 0 1 0 6.2H7.5v2.4"/>
+      <path class="blackStrokeLight" d="M7.5 10.9H5.1"/>
+      <path class="blackStrokeLight" d="M5.1 4.7v8.6"/>
+    </symbol>
+  </defs>
+
+  <rect class="bg" width="980" height="520"/>
+  <text class="title" x="40" y="54">B1 左侧两点对比</text>
+  <text class="desc" x="40" y="82">左上是真实 menu bar 尺寸；右侧是放大预览。无点版做了居中修正。</text>
+
+  <g transform="translate(40 125)">
+    <rect class="card" width="280" height="230" rx="18"/>
+    <rect class="bar" x="22" y="24" width="120" height="44" rx="8"/>
+    <use href="#withDots" x="46" y="37" width="18" height="18"/>
+    <text class="num" x="72" y="57">1</text>
+    <use href="#withDotsBlack" x="166" y="35" width="88" height="88"/>
+    <text class="label" x="24" y="150">B1-a 保留两点</text>
+    <text class="desc" x="24" y="178">优点：最像 “:port”。</text>
+    <text class="desc" x="24" y="202">缺点：小尺寸会稍微碎。</text>
+  </g>
+
+  <g transform="translate(350 125)">
+    <rect class="card" width="280" height="230" rx="18"/>
+    <rect class="bar" x="22" y="24" width="120" height="44" rx="8"/>
+    <use href="#noDotsCentered" x="46" y="37" width="18" height="18"/>
+    <text class="num" x="72" y="57">1</text>
+    <use href="#noDotsCenteredBlack" x="166" y="35" width="88" height="88"/>
+    <text class="label" x="24" y="150">B1-b 去掉两点</text>
+    <text class="desc" x="24" y="178">优点：更干净，不碎。</text>
+    <text class="desc" x="24" y="202">缺点：端口语义会弱一些。</text>
+  </g>
+
+  <g transform="translate(660 125)">
+    <rect class="card" width="280" height="230" rx="18"/>
+    <rect class="bar" x="22" y="24" width="120" height="44" rx="8"/>
+    <use href="#noDotsMonoline" x="46" y="37" width="18" height="18"/>
+    <text class="num" x="72" y="57">1</text>
+    <use href="#noDotsMonolineBlack" x="166" y="35" width="88" height="88"/>
+    <text class="label" x="24" y="150">B1-c 无点封闭版</text>
+    <text class="desc" x="24" y="178">优点：更像独立品牌符号。</text>
+    <text class="desc" x="24" y="202">缺点：更像字母 P。</text>
+  </g>
+
+  <rect class="card" x="40" y="390" width="900" height="84" rx="18"/>
+  <text class="label" x="66" y="426">我的判断</text>
+  <text class="desc" x="66" y="452">如果要强调“端口”，选 B1-a；如果要 menu bar 更干净，选 B1-b。B1-c 识别最整，但容易回到字母标。</text>
+</svg>

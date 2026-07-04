@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="760" viewBox="0 0 1120 760">
+  <defs>
+    <style>
+      .bg { fill: #f6f8fb; }
+      .card { fill: #fff; stroke: rgba(0,0,0,.08); stroke-width: 1; }
+      .bar { fill: #2387bd; }
+      .title { font: 700 22px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; fill: #1c1e21; }
+      .label { font: 600 16px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; fill: #1c1e21; }
+      .desc { font: 13px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; fill: #6b7280; }
+      .num { font: 500 24px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; fill: #fff; }
+      .smallNum { font: 500 18px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; fill: #fff; }
+      .whiteStroke { fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+      .whiteFill { fill: #fff; }
+      .blackStroke { fill: none; stroke: #111827; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+      .blackFill { fill: #111827; }
+    </style>
+    <symbol id="socket" viewBox="0 0 18 18">
+      <path class="whiteStroke" d="M5.2 3.8h7.6a1.6 1.6 0 0 1 1.6 1.6v4.1a4.4 4.4 0 0 1-4.4 4.4H8a4.4 4.4 0 0 1-4.4-4.4V5.4a1.6 1.6 0 0 1 1.6-1.6Z"/>
+      <path class="whiteStroke" d="M7 7v2.2M11 7v2.2M7.8 13.8v1.4M10.2 13.8v1.4"/>
+    </symbol>
+    <symbol id="socketBlack" viewBox="0 0 18 18">
+      <path class="blackStroke" d="M5.2 3.8h7.6a1.6 1.6 0 0 1 1.6 1.6v4.1a4.4 4.4 0 0 1-4.4 4.4H8a4.4 4.4 0 0 1-4.4-4.4V5.4a1.6 1.6 0 0 1 1.6-1.6Z"/>
+      <path class="blackStroke" d="M7 7v2.2M11 7v2.2M7.8 13.8v1.4M10.2 13.8v1.4"/>
+    </symbol>
+    <symbol id="colonPort" viewBox="0 0 18 18">
+      <circle class="whiteFill" cx="4.2" cy="6" r="1.3"/>
+      <circle class="whiteFill" cx="4.2" cy="12" r="1.3"/>
+      <path class="whiteStroke" d="M7 4.6h4.7a3.1 3.1 0 0 1 0 6.2H9.2v2.6"/>
+      <path class="whiteStroke" d="M9.2 10.8H7"/>
+    </symbol>
+    <symbol id="colonPortBlack" viewBox="0 0 18 18">
+      <circle class="blackFill" cx="4.2" cy="6" r="1.3"/>
+      <circle class="blackFill" cx="4.2" cy="12" r="1.3"/>
+      <path class="blackStroke" d="M7 4.6h4.7a3.1 3.1 0 0 1 0 6.2H9.2v2.6"/>
+      <path class="blackStroke" d="M9.2 10.8H7"/>
+    </symbol>
+    <symbol id="plug" viewBox="0 0 18 18">
+      <path class="whiteStroke" d="M6.2 3.2v3M11.8 3.2v3M5.4 6.2h7.2v2.6a3.6 3.6 0 0 1-7.2 0V6.2Z"/>
+      <path class="whiteStroke" d="M9 12.4v2.4M7.2 14.8h3.6"/>
+    </symbol>
+    <symbol id="plugBlack" viewBox="0 0 18 18">
+      <path class="blackStroke" d="M6.2 3.2v3M11.8 3.2v3M5.4 6.2h7.2v2.6a3.6 3.6 0 0 1-7.2 0V6.2Z"/>
+      <path class="blackStroke" d="M9 12.4v2.4M7.2 14.8h3.6"/>
+    </symbol>
+    <symbol id="terminalPort" viewBox="0 0 18 18">
+      <rect class="whiteStroke" x="3.2" y="4.2" width="11.6" height="9.6" rx="2"/>
+      <path class="whiteStroke" d="M5.7 7.2 7.8 9l-2.1 1.8M9.3 10.8h3"/>
+    </symbol>
+    <symbol id="terminalPortBlack" viewBox="0 0 18 18">
+      <rect class="blackStroke" x="3.2" y="4.2" width="11.6" height="9.6" rx="2"/>
+      <path class="blackStroke" d="M5.7 7.2 7.8 9l-2.1 1.8M9.3 10.8h3"/>
+    </symbol>
+    <symbol id="serverPort" viewBox="0 0 18 18">
+      <rect class="whiteStroke" x="3.6" y="4" width="10.8" height="3.8" rx="1.2"/>
+      <rect class="whiteStroke" x="3.6" y="10.2" width="10.8" height="3.8" rx="1.2"/>
+      <circle class="whiteFill" cx="6" cy="5.9" r=".7"/>
+      <circle class="whiteFill" cx="6" cy="12.1" r=".7"/>
+      <path class="whiteStroke" d="M11.2 7.8v2.4"/>
+    </symbol>
+    <symbol id="serverPortBlack" viewBox="0 0 18 18">
+      <rect class="blackStroke" x="3.6" y="4" width="10.8" height="3.8" rx="1.2"/>
+      <rect class="blackStroke" x="3.6" y="10.2" width="10.8" height="3.8" rx="1.2"/>
+      <circle class="blackFill" cx="6" cy="5.9" r=".7"/>
+      <circle class="blackFill" cx="6" cy="12.1" r=".7"/>
+      <path class="blackStroke" d="M11.2 7.8v2.4"/>
+    </symbol>
+    <symbol id="localhost" viewBox="0 0 18 18">
+      <path class="whiteStroke" d="M4.8 11.9a4.6 4.6 0 1 1 8.4 0"/>
+      <path class="whiteStroke" d="M6.8 12h4.4M9 7.4v4.6"/>
+      <circle class="whiteFill" cx="9" cy="12" r="1.6"/>
+    </symbol>
+    <symbol id="localhostBlack" viewBox="0 0 18 18">
+      <path class="blackStroke" d="M4.8 11.9a4.6 4.6 0 1 1 8.4 0"/>
+      <path class="blackStroke" d="M6.8 12h4.4M9 7.4v4.6"/>
+      <circle class="blackFill" cx="9" cy="12" r="1.6"/>
+    </symbol>
+  </defs>
+
+  <rect class="bg" width="1120" height="760"/>
+  <text class="title" x="40" y="54">Portly Menu Bar 图标候选</text>
+  <text class="desc" x="40" y="82">上方是菜单栏真实观感，右侧是同一图标放大 4 倍。建议选 A / B / C 之一。</text>
+
+  <g transform="translate(40 120)">
+    <rect class="card" x="0" y="0" width="330" height="170" rx="18"/>
+    <rect class="bar" x="18" y="22" width="128" height="44" rx="8"/>
+    <use href="#socket" x="44" y="35" width="18" height="18"/>
+    <text class="num" x="70" y="55">1</text>
+    <use href="#socketBlack" x="205" y="34" width="72" height="72"/>
+    <text class="label" x="22" y="104">A. Socket</text>
+    <text class="desc" x="22" y="130">最像“端口/插口”，语义最直接。</text>
+  </g>
+
+  <g transform="translate(395 120)">
+    <rect class="card" x="0" y="0" width="330" height="170" rx="18"/>
+    <rect class="bar" x="18" y="22" width="128" height="44" rx="8"/>
+    <use href="#colonPort" x="44" y="35" width="18" height="18"/>
+    <text class="num" x="70" y="55">1</text>
+    <use href="#colonPortBlack" x="205" y="34" width="72" height="72"/>
+    <text class="label" x="22" y="104">B. Colon Port</text>
+    <text class="desc" x="22" y="130">保留 :5173 的端口感，开发者更容易懂。</text>
+  </g>
+
+  <g transform="translate(750 120)">
+    <rect class="card" x="0" y="0" width="330" height="170" rx="18"/>
+    <rect class="bar" x="18" y="22" width="128" height="44" rx="8"/>
+    <use href="#plug" x="44" y="35" width="18" height="18"/>
+    <text class="num" x="70" y="55">1</text>
+    <use href="#plugBlack" x="205" y="34" width="72" height="72"/>
+    <text class="label" x="22" y="104">C. Plug</text>
+    <text class="desc" x="22" y="130">更像“连接/服务已启动”，系统感强。</text>
+  </g>
+
+  <g transform="translate(40 330)">
+    <rect class="card" x="0" y="0" width="330" height="170" rx="18"/>
+    <rect class="bar" x="18" y="22" width="128" height="44" rx="8"/>
+    <use href="#terminalPort" x="44" y="35" width="18" height="18"/>
+    <text class="num" x="70" y="55">1</text>
+    <use href="#terminalPortBlack" x="205" y="34" width="72" height="72"/>
+    <text class="label" x="22" y="104">D. Terminal</text>
+    <text class="desc" x="22" y="130">开发者工具感最强，但端口语义弱一点。</text>
+  </g>
+
+  <g transform="translate(395 330)">
+    <rect class="card" x="0" y="0" width="330" height="170" rx="18"/>
+    <rect class="bar" x="18" y="22" width="128" height="44" rx="8"/>
+    <use href="#serverPort" x="44" y="35" width="18" height="18"/>
+    <text class="num" x="70" y="55">1</text>
+    <use href="#serverPortBlack" x="205" y="34" width="72" height="72"/>
+    <text class="label" x="22" y="104">E. Server Stack</text>
+    <text class="desc" x="22" y="130">偏“监听服务列表”，适合多端口监控。</text>
+  </g>
+
+  <g transform="translate(750 330)">
+    <rect class="card" x="0" y="0" width="330" height="170" rx="18"/>
+    <rect class="bar" x="18" y="22" width="128" height="44" rx="8"/>
+    <use href="#localhost" x="44" y="35" width="18" height="18"/>
+    <text class="num" x="70" y="55">1</text>
+    <use href="#localhostBlack" x="205" y="34" width="72" height="72"/>
+    <text class="label" x="22" y="104">F. Localhost</text>
+    <text class="desc" x="22" y="130">表示本地服务，但和“仪表盘”有点像。</text>
+  </g>
+
+  <rect class="card" x="40" y="565" width="1040" height="105" rx="18"/>
+  <text class="label" x="66" y="604">我的建议</text>
+  <text class="desc" x="66" y="632">首选 B：把“冒号端口”的符号感做成图标，和 Portly 的实际信息 :5173 最贴合。</text>
+  <text class="desc" x="66" y="656">如果你想要更大众易懂，选 A；如果想更像 macOS 系统工具，选 C。</text>
+</svg>
