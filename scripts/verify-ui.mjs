@@ -39,6 +39,7 @@ for (const mode of modes) {
     await win.screenshot({ path: screenshotPath, fullPage: true });
     const autoRefreshMetrics = mode.name === 'real' ? await verifyAutoRefreshFlow(win, baseMetrics) : null;
     const searchMetrics = await verifySearchFlow(win, mode.name);
+    assertSearchMetrics(searchMetrics);
 
     await clickByAria(win, '刷新端口列表');
     await win.waitForTimeout(500);
@@ -161,6 +162,11 @@ async function verifySearchFlow(win, modeName) {
   await input.fill('5173');
   await win.waitForTimeout(120);
   const afterPortQuery = await collectMetrics(win);
+  const afterPortQuerySearchState = await collectSearchMetrics(win);
+
+  await win.keyboard.press('Escape');
+  await win.waitForTimeout(120);
+  const afterEscapeSearchState = await collectSearchMetrics(win);
 
   await input.fill('zz-no-match');
   await win.waitForTimeout(120);
@@ -168,14 +174,53 @@ async function verifySearchFlow(win, modeName) {
 
   await input.fill('');
   await win.waitForTimeout(120);
+  await input.blur();
+  await win.waitForTimeout(180);
+  const defaultSearchState = await collectSearchMetrics(win);
+  await input.focus();
+  await win.waitForTimeout(180);
+  const focusedSearchState = await collectSearchMetrics(win);
 
   return {
     visible: true,
     portQueryDevRows: afterPortQuery.devRows,
     portQueryHasPort: afterPortQuery.text.includes(':5173'),
     noMatchTextShown: afterNoMatch.text.includes('没有匹配的端口'),
-    noMatchOverflow: afterNoMatch.overflow
+    noMatchOverflow: afterNoMatch.overflow,
+    hasClearButtonWithQuery: afterPortQuerySearchState.hasClearButton,
+    escapeClearsQuery: afterEscapeSearchState.value === '',
+    escapeHidesClearButton: !afterEscapeSearchState.hasClearButton,
+    defaultBorderIsSubtle: defaultSearchState.borderColor !== defaultSearchState.accentColor,
+    focusedBorderIsAccent: focusedSearchState.borderColor === focusedSearchState.accentColor
   };
+}
+
+function assertSearchMetrics(metrics) {
+  for (const [key, value] of Object.entries(metrics)) {
+    if (value !== true) {
+      throw new Error(`Search flow check failed: ${key}=${value}`);
+    }
+  }
+}
+
+async function collectSearchMetrics(win) {
+  return win.evaluate(() => {
+    const wrap = document.querySelector('.search-wrap');
+    const input = document.querySelector('.search-input');
+    const styles = wrap ? getComputedStyle(wrap) : null;
+    const rootStyles = getComputedStyle(document.documentElement);
+    const probe = document.createElement('span');
+    probe.style.color = rootStyles.getPropertyValue('--accent').trim();
+    document.body.appendChild(probe);
+    const accentColor = getComputedStyle(probe).color;
+    probe.remove();
+    return {
+      value: input?.value ?? '',
+      hasClearButton: Boolean(document.querySelector('.search-clear')),
+      borderColor: styles?.borderColor ?? '',
+      accentColor
+    };
+  });
 }
 
 async function verifyKillFlow(win) {
@@ -234,7 +279,8 @@ async function verifyKillFlow(win) {
     confirmDoesNotRepeatPort: !confirmText.includes(':5173'),
     cancelShowsKillToast: cancelText.includes('已结束') || cancelText.includes('已强制结束'),
     normalKillToastShown: normalKillText.includes('已结束'),
-    forceKillToastShown: forceKillText.includes('已强制结束')
+    forceKillToastShown: forceKillText.includes('已强制结束'),
+    successKillToastHidden: !normalKillText.includes('已结束') && !forceKillText.includes('已强制结束')
   };
 }
 

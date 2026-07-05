@@ -17,7 +17,7 @@ export interface KillProcessRequest {
 }
 
 export async function killProcess(request: KillProcessRequest): Promise<ProcessActionResult> {
-  const { pid, port, waitMs = 900, isListening = isPidListeningOnPort } = request;
+  const { pid, port, waitMs = 200, isListening = isPidListeningOnPort } = request;
   if (!Number.isInteger(pid) || pid <= 0) {
     return { ok: false, error: 'PID 无效' };
   }

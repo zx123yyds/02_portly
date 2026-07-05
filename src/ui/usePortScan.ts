@@ -8,6 +8,8 @@ const fallbackResult: PortScanResult = {
   source: 'browser-fallback'
 };
 
+const MIN_VISIBLE_REFRESH_MS = 450;
+
 interface RefreshPortsOptions {
   notifyError?: boolean;
   preserveOnError?: boolean;
@@ -29,6 +31,7 @@ export function usePortScan(onError: () => void) {
   }: RefreshPortsOptions = {}) => {
     if (refreshingRef.current) return refreshingRef.current;
 
+    const refreshStartedAt = performance.now();
     if (showLoading) setLoading(true);
 
     const task = (async () => {
@@ -50,6 +53,7 @@ export function usePortScan(onError: () => void) {
         if (notifyError) onError();
         return result;
       } finally {
+        if (showLoading) await waitForMinimumDuration(refreshStartedAt, MIN_VISIBLE_REFRESH_MS);
         if (showLoading) setLoading(false);
         refreshingRef.current = null;
       }
@@ -70,3 +74,9 @@ export function usePortScan(onError: () => void) {
 
 export type PortScanController = ReturnType<typeof usePortScan>;
 export type PortAction = (port: PortEntry) => void;
+
+export async function waitForMinimumDuration(startedAt: number, minDurationMs: number): Promise<void> {
+  const remaining = minDurationMs - (performance.now() - startedAt);
+  if (remaining <= 0) return;
+  await new Promise((resolve) => globalThis.setTimeout(resolve, remaining));
+}

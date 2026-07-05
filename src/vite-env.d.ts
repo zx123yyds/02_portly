@@ -18,6 +18,8 @@ declare global {
       }>;
       windowState: () => Promise<{ visible: boolean; focused: boolean; devToolsOpened: boolean }>;
       testBlur: () => Promise<{ visible: boolean; focused: boolean; devToolsOpened: boolean }>;
+      getLoginItemSettings: () => Promise<{ ok: boolean; openAtLogin: boolean; error?: string }>;
+      setLoginItemSettings: (openAtLogin: boolean) => Promise<{ ok: boolean; openAtLogin: boolean; error?: string }>;
       openPort: (port: number) => Promise<{ ok: boolean; error?: string }>;
       openTerminal: (cwd: string) => Promise<{ ok: boolean; error?: string }>;
       killProcess: (payload: { pid: number; port: number }) => Promise<{ ok: boolean; error?: string; signal?: string }>;

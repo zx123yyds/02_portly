@@ -16,25 +16,29 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
     "build": "npm run typecheck && vite build && tsc -p tsconfig.electron.json && cp electron-build-package.json dist-electron/package.json",
-    "start": "electron ."
+    "start": "electron .",
+    "pack:mac": "npm run build && node scripts/package-mac.mjs",
+    "dist:mac": "npm run pack:mac",
+    "prepare:app": "node scripts/prepare-app.mjs"
   },
   "dependencies": {
-    "electron": "^42.5.0",
     "lucide-react": "^0.563.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^5.1.1",
     "@types/node": "^24.10.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
+    "electron": "^42.5.0",
     "playwright-core": "^1.61.1",
     "typescript": "^5.9.3",
     "vite": "^8.1.0",
     "vitest": "^4.0.16",
     "wait-on": "^9.0.3"
-  }
+  },
+  "author": "zx123yyds"
 }

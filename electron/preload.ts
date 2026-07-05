@@ -15,6 +15,8 @@ contextBridge.exposeInMainWorld('portly', {
   }> => ipcRenderer.invoke('app:diagnostics'),
   windowState: (): Promise<{ visible: boolean; focused: boolean; devToolsOpened: boolean }> => ipcRenderer.invoke('app:window-state'),
   testBlur: (): Promise<{ visible: boolean; focused: boolean; devToolsOpened: boolean }> => ipcRenderer.invoke('app:test-blur'),
+  getLoginItemSettings: (): Promise<{ ok: boolean; openAtLogin: boolean; error?: string }> => ipcRenderer.invoke('app:get-login-item-settings'),
+  setLoginItemSettings: (openAtLogin: boolean): Promise<{ ok: boolean; openAtLogin: boolean; error?: string }> => ipcRenderer.invoke('app:set-login-item-settings', openAtLogin),
   openPort: (port: number): Promise<{ ok: boolean; error?: string }> => ipcRenderer.invoke('ports:open', port),
   openTerminal: (cwd: string): Promise<{ ok: boolean; error?: string }> => ipcRenderer.invoke('ports:open-terminal', cwd),
   killProcess: (payload: { pid: number; port: number }): Promise<{ ok: boolean; error?: string; signal?: string }> => ipcRenderer.invoke('ports:kill', payload),

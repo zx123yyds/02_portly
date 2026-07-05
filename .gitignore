@@ -3,6 +3,8 @@
 node_modules/
 dist/
 dist-electron/
+app/
+release/
 artifacts/screenshots/
 *.log
 npm-debug.log*
@@ -12,3 +14,6 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
+
+# mac packaging scratch
+build/Portly.iconset/

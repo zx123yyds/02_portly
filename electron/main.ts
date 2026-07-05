@@ -3,6 +3,7 @@ import { execFile } from 'node:child_process';
 import { statSync } from 'node:fs';
 import path from 'node:path';
 import { promisify } from 'node:util';
+import { getLoginItemState, setLoginItemState } from './loginItem.js';
 import { killProcess } from './processControl.js';
 import { scanListeningPorts } from './portScanner.js';
 import type { PortScanResult } from '../src/types.js';
@@ -66,6 +67,10 @@ ipcMain.handle('app:test-blur', () => {
     devToolsOpened: Boolean(popover?.webContents.isDevToolsOpened())
   };
 });
+
+ipcMain.handle('app:get-login-item-settings', () => getLoginItemState());
+
+ipcMain.handle('app:set-login-item-settings', (_event, openAtLogin: boolean) => setLoginItemState(Boolean(openAtLogin), { isDev }));
 
 ipcMain.handle('ports:open', async (_event, port: number) => {
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
@@ -172,6 +177,7 @@ function createPopover(): void {
     resizable: false,
     fullscreenable: false,
     transparent: true,
+    backgroundColor: '#00000000',
     hasShadow: false,
     skipTaskbar: true,
     webPreferences: {
@@ -180,6 +186,7 @@ function createPopover(): void {
       nodeIntegration: false
     }
   });
+  popover.setBackgroundColor('#00000000');
 
   popover.on('blur', () => handlePopoverBlur());
 
