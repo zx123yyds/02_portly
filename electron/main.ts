@@ -4,6 +4,7 @@ import { statSync } from 'node:fs';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { getLoginItemState, setLoginItemState } from './loginItem.js';
+import { resolveTerminalDirectory } from './pathUtils.js';
 import { killProcess } from './processControl.js';
 import { scanListeningPorts } from './portScanner.js';
 import type { PortScanResult } from '../src/types.js';
@@ -21,6 +22,7 @@ const showOnReadyForTests = process.env.PORTLY_TEST_SHOW_ON_READY === '1';
 const mockKillForTests = process.env.PORTLY_TEST_KILL_MODE === 'mock';
 const mockTerminalForTests = process.env.PORTLY_TEST_TERMINAL_MODE === 'mock';
 let mockKillCount = 0;
+let allowSyntheticBlurForTests = false;
 
 app.setName('Portly');
 
@@ -60,7 +62,9 @@ ipcMain.handle('app:window-state', () => ({
 }));
 
 ipcMain.handle('app:test-blur', () => {
+  allowSyntheticBlurForTests = true;
   handlePopoverBlur();
+  allowSyntheticBlurForTests = false;
   return {
     visible: Boolean(popover?.isVisible()),
     focused: Boolean(popover?.isFocused()),
@@ -86,7 +90,7 @@ ipcMain.handle('ports:open-terminal', async (_event, cwd: string) => {
     return { ok: false, error: '执行路径无效' };
   }
 
-  const normalizedCwd = path.resolve(cwd);
+  const normalizedCwd = resolveTerminalDirectory(cwd);
   try {
     if (!statSync(normalizedCwd).isDirectory()) {
       return { ok: false, error: '执行路径不是目录' };
@@ -190,20 +194,21 @@ function createPopover(): void {
 
   popover.on('blur', () => handlePopoverBlur());
 
-  if (isDev) {
-    void popover.loadURL(process.env.VITE_DEV_SERVER_URL as string);
-  } else {
-    void popover.loadFile(path.join(__dirname, '../../dist/index.html'));
-  }
-
   if (keepVisibleForTests || showOnReadyForTests) {
     popover.once('ready-to-show', () => {
       popover?.show();
     });
   }
+
+  if (isDev) {
+    void popover.loadURL(process.env.VITE_DEV_SERVER_URL as string);
+  } else {
+    void popover.loadFile(path.join(__dirname, '../../dist/index.html'));
+  }
 }
 
 function handlePopoverBlur(): void {
+  if (showOnReadyForTests && !allowSyntheticBlurForTests) return;
   if (!keepVisibleForTests) popover?.hide();
 }
 

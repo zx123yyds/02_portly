@@ -1,32 +1,42 @@
-import { ChevronRight, Clock, Cpu, ExternalLink, HardDrive, Power, Terminal } from 'lucide-react';
+import { ChevronRight, Clock, Cpu, Globe, HardDrive, Power, Terminal } from 'lucide-react';
 import type { PortEntry } from '../types';
 
 export function PortRow({
   port,
+  ports,
+  variant = 'default',
   index,
   expanded,
   confirmingKill = false,
   onToggle,
   onOpen,
+  showOpenAction = true,
   onOpenTerminal,
   onKill,
   onCancelKill,
   onConfirmKill
 }: {
   port: PortEntry;
+  ports?: PortEntry[];
+  variant?: 'default' | 'chips';
   index?: number;
   expanded: boolean;
   confirmingKill?: boolean;
   onToggle: () => void;
   onOpen: () => void;
+  showOpenAction?: boolean;
   onOpenTerminal: () => void;
   onKill: () => void;
   onCancelKill?: () => void;
   onConfirmKill?: () => void;
 }) {
+  const groupedPorts = ports?.length ? ports : [port];
+  const extraPortCount = groupedPorts.length - 1;
+  const showChipLayout = variant === 'chips' && extraPortCount > 0;
+
   return (
     <article
-      className={`row ${expanded ? 'expanded' : ''} ${confirmingKill ? 'confirming-kill' : ''}`}
+      className={`row ${showChipLayout ? 'port-chip-row' : ''} ${expanded ? 'expanded' : ''} ${confirmingKill ? 'confirming-kill' : ''}`}
       role="listitem"
       tabIndex={0}
       onClick={onToggle}
@@ -39,7 +49,10 @@ export function PortRow({
       aria-expanded={expanded}
     >
       <div className="row-main">
-        <span className="port" aria-label={`端口 ${port.port}`}>:{port.port}</span>
+        <span className="port" aria-label={extraPortCount > 0 ? `端口 ${groupedPorts.map((item) => item.port).join('、')}` : `端口 ${port.port}`}>
+          :{port.port}
+          {extraPortCount > 0 ? <small>+{extraPortCount}</small> : null}
+        </span>
         <span className="row-disclosure" aria-hidden="true">
           <ChevronRight size={13} />
         </span>
@@ -62,10 +75,12 @@ export function PortRow({
             </>
           ) : (
             <>
-              <button className="action-tip" aria-label={`在浏览器打开 localhost:${port.port}`} onClick={(event) => { event.stopPropagation(); onOpen(); }}>
-                <ExternalLink size={13} />
-                <span className="action-tip-label" role="tooltip">浏览器</span>
-              </button>
+              {showOpenAction ? (
+                <button className="action-tip" aria-label={`在浏览器打开 localhost:${port.port}`} onClick={(event) => { event.stopPropagation(); onOpen(); }}>
+                  <Globe size={13} />
+                  <span className="action-tip-label" role="tooltip">浏览器</span>
+                </button>
+              ) : <span className="action-spacer" aria-hidden="true" />}
               <button className="action-tip" aria-label={`在终端打开 ${port.cwd}`} onClick={(event) => { event.stopPropagation(); onOpenTerminal(); }}>
                 <Terminal size={13} />
                 <span className="action-tip-label" role="tooltip">终端</span>
@@ -78,11 +93,25 @@ export function PortRow({
           )}
         </div>
       </div>
+      {showChipLayout ? (
+        <div className="port-chips" aria-label={`${displayName(port)} 监听端口`}>
+          {groupedPorts.slice(1).map((item) => (
+            <span
+              key={item.id}
+              className="port-chip"
+              aria-label={`端口 ${item.port}`}
+            >
+              {item.port}
+            </span>
+          ))}
+        </div>
+      ) : null}
       {expanded ? (
         <div className="row-detail">
           <DetailRow label="PID" value={String(port.pid)} />
           <DetailRow label="命令" value={port.command} />
-          <DetailRow label="目录" value={port.cwd} />
+          {extraPortCount > 0 && !showChipLayout ? <DetailRow label="端口" value={groupedPorts.map((item) => item.port).join('、')} /> : null}
+          <DetailRow label="路径" value={port.cwd} />
         </div>
       ) : null}
     </article>

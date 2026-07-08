@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatElapsedTime, inferProjectNameFromContext, parsePsOutput, preferReliableCommand } from './portScanner';
+import { displayPathFromContext, formatElapsedTime, inferProjectNameFromContext, parsePsOutput, preferReliableCommand } from './portScanner';
 
 describe('formatElapsedTime', () => {
   it('drops seconds and formats elapsed time as hours and minutes', () => {
@@ -82,6 +82,56 @@ describe('preferReliableCommand', () => {
 
   it('keeps generic lsof command names for details', () => {
     expect(preferReliableCommand('node', 'vite')).toBe('node');
+  });
+});
+
+describe('displayPathFromContext', () => {
+  it('keeps a useful cwd as the display path', () => {
+    expect(displayPathFromContext({
+      command: 'node',
+      cwd: '/Users/me/work/portly',
+      args: '--user-data-dir=/Users/me/Library/Application Support/Comate'
+    })).toBe('/Users/me/work/portly');
+  });
+
+  it('uses cwd before an application bundle for generic development commands', () => {
+    expect(displayPathFromContext({
+      command: 'node',
+      cwd: '/Users/me/work/portly',
+      args: '/Applications/Electron.app/Contents/MacOS/Electron /Users/me/work/portly/server.js'
+    })).toBe('/Users/me/work/portly');
+  });
+
+  it('uses the application bundle before cwd for concrete apps', () => {
+    expect(displayPathFromContext({
+      command: 'WeChat',
+      cwd: '/Users/me/Library/Containers/com.tencent.xinWeChat/Data',
+      args: '/Applications/WeChat.app/Contents/MacOS/WeChat'
+    })).toBe('/Applications/WeChat.app');
+  });
+
+  it('uses the application bundle before user-data-dir for concrete apps', () => {
+    expect(displayPathFromContext({
+      command: 'Comate',
+      cwd: '/',
+      args: '/Applications/Comate.app/Contents/MacOS/Comate --user-data-dir=/Users/me/Library/Application Support/Comate --lang=zh-CN'
+    })).toBe('/Applications/Comate.app');
+  });
+
+  it('uses user-data-dir when cwd and application bundle are unavailable', () => {
+    expect(displayPathFromContext({
+      command: 'Comate',
+      cwd: '/',
+      args: '/opt/comate-helper --user-data-dir=/Users/me/Library/Application Support/Comate --lang=zh-CN'
+    })).toBe('/Users/me/Library/Application Support/Comate');
+  });
+
+  it('falls back to the application bundle when cwd is unavailable', () => {
+    expect(displayPathFromContext({
+      command: 'Comate',
+      cwd: '未知',
+      args: '/Applications/Comate.app/Contents/Frameworks/Comate Helper.app/Contents/MacOS/Comate Helper'
+    })).toBe('/Applications/Comate.app');
   });
 });
 

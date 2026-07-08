@@ -5,7 +5,9 @@ dist/
 dist-electron/
 app/
 release/
+artifacts/*ui-comparison*.html
 artifacts/screenshots/
+docs/project-retrospective.md
 *.log
 npm-debug.log*
 yarn-debug.log*

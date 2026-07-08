@@ -142,7 +142,7 @@ async function verifyAutoRefreshFlow(win, beforeMetrics) {
   return {
     footerTitleChanged: before.footerTitle !== after.footerTitle,
     expandedPreserved: beforeMetrics.devRows > 0 ? before.expanded && after.expanded : true,
-    overflowAfterAutoRefresh: after.overflow
+    noOverflowAfterAutoRefresh: !after.overflow
   };
 }
 
@@ -183,10 +183,10 @@ async function verifySearchFlow(win, modeName) {
 
   return {
     visible: true,
-    portQueryDevRows: afterPortQuery.devRows,
+    portQueryDevRows: afterPortQuery.devRows > 0,
     portQueryHasPort: afterPortQuery.text.includes(':5173'),
     noMatchTextShown: afterNoMatch.text.includes('没有匹配的端口'),
-    noMatchOverflow: afterNoMatch.overflow,
+    noMatchNoOverflow: !afterNoMatch.overflow,
     hasClearButtonWithQuery: afterPortQuerySearchState.hasClearButton,
     escapeClearsQuery: afterEscapeSearchState.value === '',
     escapeHidesClearButton: !afterEscapeSearchState.hasClearButton,
@@ -278,8 +278,6 @@ async function verifyKillFlow(win) {
     confirmUsesChineseLabels: !/(Kill|Open|Copy)/.test(confirmText),
     confirmDoesNotRepeatPort: !confirmText.includes(':5173'),
     cancelShowsKillToast: cancelText.includes('已结束') || cancelText.includes('已强制结束'),
-    normalKillToastShown: normalKillText.includes('已结束'),
-    forceKillToastShown: forceKillText.includes('已强制结束'),
     successKillToastHidden: !normalKillText.includes('已结束') && !forceKillText.includes('已强制结束')
   };
 }

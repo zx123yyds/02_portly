@@ -1,10 +1,12 @@
 import { AlertCircle, LoaderCircle, RefreshCw, Search, Settings, X } from 'lucide-react';
 import { type CSSProperties, useCallback, useEffect, useRef, useState } from 'react';
 import { filterPorts } from '../lib/filterPorts';
+import { groupPortsByProcess } from '../lib/groupPorts';
 import type { PortEntry } from '../types';
 import { PortRow, displayName } from './PortRow';
 import { StatePanel } from './StatePanel';
 import { DEFAULT_SETTINGS, loadSettings, normalizeRefreshInterval, refreshIntervalFillPercent, type PortlySettings, type PortlyTheme, saveSettings } from './settings';
+import { formatScanTime } from './timeFormat';
 import { usePortScan } from './usePortScan';
 import { useToast } from './useToast';
 
@@ -23,10 +25,12 @@ export function App() {
   const { toast, setToast } = useToast();
   const handleScanError = useCallback(() => setToast('端口读取失败'), [setToast]);
   const { scan, loading, devPorts, otherPorts, refreshPorts } = usePortScan(handleScanError);
-  const visibleDevPorts = devPorts.filter((port) => !closingPortIds.has(port.id));
-  const visibleOtherPorts = otherPorts.filter((port) => !closingPortIds.has(port.id));
+  const visibleDevPorts = devPorts.filter((port) => !closingPortIds.has(port.id) && !closingPortIds.has(processClosingId(port.pid)));
+  const visibleOtherPorts = otherPorts.filter((port) => !closingPortIds.has(port.id) && !closingPortIds.has(processClosingId(port.pid)));
   const filteredDevPorts = filterPorts(visibleDevPorts, query);
   const filteredOtherPorts = filterPorts(visibleOtherPorts, query);
+  const groupedDevPorts = groupPortsByProcess(filteredDevPorts);
+  const groupedOtherPorts = groupPortsByProcess(filteredOtherPorts);
   const hasQuery = query.trim().length > 0;
 
   async function refreshPortList({ clearToast = true, showLoading = true } = {}) {
@@ -167,6 +171,7 @@ export function App() {
     setClosingPortIds((current) => {
       const next = new Set(current);
       next.add(port.id);
+      next.add(processClosingId(port.pid));
       return next;
     });
 
@@ -174,6 +179,7 @@ export function App() {
       setClosingPortIds((current) => {
         const next = new Set(current);
         next.delete(port.id);
+        next.delete(processClosingId(port.pid));
         return next;
       });
       setToast('预览模式不能结束进程');
@@ -195,6 +201,7 @@ export function App() {
     setClosingPortIds((current) => {
       const next = new Set(current);
       next.delete(port.id);
+      next.delete(processClosingId(port.pid));
       return next;
     });
   }
@@ -236,123 +243,133 @@ export function App() {
           </>
         ) : (
           <>
-            <header className="header">
-              <div>
-                <h1>Portly</h1>
-                <span className={`dev-badge ${scan.ok ? '' : 'is-error'}`} aria-live="polite">
-                  {loading ? '正在扫描' : `${devPorts.length} 个开发服务`}
-                </span>
-              </div>
-              <div className="header-actions">
-                <button title="刷新" aria-label="刷新端口列表" onMouseDown={(event) => event.preventDefault()} onClick={() => void refreshPortList()} disabled={loading}>
-                  {loading ? <LoaderCircle className="spin" size={14} /> : <RefreshCw size={14} />}
-                </button>
-                <button title="设置" aria-label="打开设置" onMouseDown={(event) => event.preventDefault()} onClick={() => setShowSettings(true)}>
-                  <Settings size={14} />
-                </button>
-              </div>
-            </header>
+            <div className="popover-top">
+              <header className="header">
+                <div>
+                  <h1>Portly</h1>
+                  <span className={`dev-badge ${scan.ok ? '' : 'is-error'}`} aria-live="polite">
+                    {loading ? '正在扫描' : `${devPorts.length} 个开发服务`}
+                  </span>
+                </div>
+                <div className="header-actions">
+                  <button title="刷新" aria-label="刷新端口列表" onMouseDown={(event) => event.preventDefault()} onClick={() => void refreshPortList()} disabled={loading}>
+                    {loading ? <LoaderCircle className="spin" size={14} /> : <RefreshCw size={14} />}
+                  </button>
+                  <button title="设置" aria-label="打开设置" onMouseDown={(event) => event.preventDefault()} onClick={() => setShowSettings(true)}>
+                    <Settings size={14} />
+                  </button>
+                </div>
+              </header>
 
-            <div className={`search-wrap ${hasQuery ? 'has-query' : ''}`}>
-              <Search className="search-icon" size={16} aria-hidden="true" />
-              <input
-                aria-label="搜索端口或服务名"
-                className="search-input"
-                placeholder="搜索端口或服务名..."
-                ref={searchInputRef}
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Escape' && query) {
-                    event.preventDefault();
-                    setQuery('');
-                  }
-                }}
-              />
-              {hasQuery ? (
-                <button
-                  aria-label="清空搜索"
-                  className="search-clear"
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={clearSearch}
-                  title="清空搜索"
-                  type="button"
-                >
-                  <X size={13} />
-                </button>
-              ) : null}
+              <div className={`search-wrap ${hasQuery ? 'has-query' : ''}`}>
+                <Search className="search-icon" size={16} aria-hidden="true" />
+                <input
+                  aria-label="搜索端口或服务名"
+                  className="search-input"
+                  placeholder="搜索端口或服务名..."
+                  ref={searchInputRef}
+                  type="search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape' && query) {
+                      event.preventDefault();
+                      setQuery('');
+                    }
+                  }}
+                />
+                {hasQuery ? (
+                  <button
+                    aria-label="清空搜索"
+                    className="search-clear"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={clearSearch}
+                    title="清空搜索"
+                    type="button"
+                  >
+                    <X size={13} />
+                  </button>
+                ) : null}
+              </div>
             </div>
 
-            <section className="list" role="list" aria-label="开发服务端口列表">
-              {loading ? (
-                <StatePanel icon={<LoaderCircle className="spin" size={32} />} title="正在读取监听端口" />
-              ) : !scan.ok ? (
-                <StatePanel icon={<AlertCircle size={32} />} title="无法读取端口" detail={scan.error || '系统命令返回失败，未使用 mock 数据。'} tone="error" />
-              ) : devPorts.length === 0 && !hasQuery ? (
-                <StatePanel icon={<AlertCircle size={32} />} title="暂无开发服务运行" detail="当前没有识别到常见开发端口或开发进程。" />
-              ) : filteredDevPorts.length === 0 && filteredOtherPorts.length === 0 ? (
-                <StatePanel icon={<Search size={32} />} title="没有匹配的端口" detail="换个端口号、服务名或命令试试。" />
-              ) : (
-                filteredDevPorts.map((port, index) => (
-                  <PortRow
-                    key={port.id}
-                    port={port}
-                    index={index}
-                    expanded={expandedIds.has(port.id)}
-                    onToggle={() => toggleExpanded(port.id)}
-                    onOpen={() => void openPort(port.port)}
-                    onOpenTerminal={() => void openTerminal(port)}
-                    onKill={() => void killPortProcess(port)}
-                    confirmingKill={pendingKill?.id === port.id}
-                    onCancelKill={cancelKillProcess}
-                    onConfirmKill={() => void confirmKillProcess()}
-                  />
-                ))
-              )}
-            </section>
+            <div className="port-scroll">
+              <section className="list" role="list" aria-label="开发服务端口列表">
+                {loading ? (
+                  <StatePanel icon={<LoaderCircle className="spin" size={32} />} title="正在读取监听端口" />
+                ) : !scan.ok ? (
+                  <StatePanel icon={<AlertCircle size={32} />} title="无法读取端口" detail={scan.error || '系统命令返回失败，未使用 mock 数据。'} tone="error" />
+                ) : devPorts.length === 0 && !hasQuery ? (
+                  <StatePanel icon={<AlertCircle size={32} />} title="暂无开发服务运行" detail="当前没有识别到常见开发端口或开发进程。" />
+                ) : filteredDevPorts.length === 0 && filteredOtherPorts.length === 0 ? (
+                  <StatePanel icon={<Search size={32} />} title="没有匹配的端口" detail="换个端口号、服务名或命令试试。" />
+                ) : (
+                  groupedDevPorts.map(({ primary, ports }, index) => (
+                    <PortRow
+                      key={primary.id}
+                      port={primary}
+                      ports={ports}
+                      variant="chips"
+                      index={index}
+                      expanded={expandedIds.has(primary.id)}
+                      onToggle={() => toggleExpanded(primary.id)}
+                      onOpen={() => void openPort(primary.port)}
+                      onOpenTerminal={() => void openTerminal(primary)}
+                      onKill={() => void killPortProcess(primary)}
+                      confirmingKill={pendingKill?.id === primary.id}
+                      onCancelKill={cancelKillProcess}
+                      onConfirmKill={() => void confirmKillProcess()}
+                    />
+                  ))
+                )}
+              </section>
 
-            <div className="separator" role="separator" />
+              <div className="separator" role="separator" />
 
-            <button
-              className={`toggle-btn ${showOthers ? 'open' : ''}`}
-              onClick={() => setShowOthers(!showOthers)}
-              aria-expanded={showOthers}
-            >
-              另有 <span>{filteredOtherPorts.length}</span> 个端口监听中
-            </button>
+              <button
+                className={`toggle-btn ${showOthers ? 'open' : ''}`}
+                onClick={() => setShowOthers(!showOthers)}
+                aria-expanded={showOthers}
+              >
+                另有 <span>{filteredOtherPorts.length}</span> 个端口监听中
+              </button>
 
-            <section className={`other-list ${showOthers ? 'show' : ''}`} role="list" aria-label="其他端口列表">
-              {filteredOtherPorts.length === 0 ? (
-                <div className="other-empty">没有其他监听端口</div>
-              ) : (
-                filteredOtherPorts.map((port) => (
-                  <PortRow
-                    key={port.id}
-                    port={port}
-                    expanded={expandedIds.has(port.id)}
-                    onToggle={() => toggleExpanded(port.id)}
-                    onOpen={() => void openPort(port.port)}
-                    onOpenTerminal={() => void openTerminal(port)}
-                    onKill={() => void killPortProcess(port)}
-                    confirmingKill={pendingKill?.id === port.id}
-                    onCancelKill={cancelKillProcess}
-                    onConfirmKill={() => void confirmKillProcess()}
-                  />
-                ))
-              )}
-            </section>
+              <section className={`other-list ${showOthers ? 'show' : ''}`} role="list" aria-label="其他端口列表">
+                {filteredOtherPorts.length === 0 ? (
+                  <div className="other-empty">没有其他监听端口</div>
+                ) : (
+                  groupedOtherPorts.map(({ primary, ports }) => (
+                    <PortRow
+                      key={primary.id}
+                      port={primary}
+                      ports={ports}
+                      variant="chips"
+                      expanded={expandedIds.has(primary.id)}
+                      onToggle={() => toggleExpanded(primary.id)}
+                      onOpen={() => {}}
+                      showOpenAction={false}
+                      onOpenTerminal={() => void openTerminal(primary)}
+                      onKill={() => void killPortProcess(primary)}
+                      confirmingKill={pendingKill?.id === primary.id}
+                      onCancelKill={cancelKillProcess}
+                      onConfirmKill={() => void confirmKillProcess()}
+                    />
+                  ))
+                )}
+              </section>
+            </div>
 
-            <div className="separator" role="separator" />
-
-            <footer className="footer">
-              <span className="footer-left" title={`最近刷新：${formatExactTime(scan.scannedAt)}`}>
-                {footerLabel} {formatTime(scan.scannedAt)}
-              </span>
-              <div className="footer-right">
-                <button onClick={quit} aria-label="退出 Portly">退出</button>
-              </div>
-            </footer>
+            <div className="popover-bottom">
+              <div className="separator" role="separator" />
+              <footer className="footer">
+                <span className="footer-left" title={`最近刷新：${formatScanTime(scan.scannedAt)}`}>
+                  {footerLabel} {formatScanTime(scan.scannedAt)}
+                </span>
+                <div className="footer-right">
+                  <button onClick={quit} aria-label="退出 Portly">退出</button>
+                </div>
+              </footer>
+            </div>
           </>
         )}
       </main>
@@ -371,6 +388,10 @@ export function App() {
       return next;
     });
   }
+}
+
+function processClosingId(pid: number) {
+  return `pid:${pid}`;
 }
 
 function SettingsPanel({
@@ -471,16 +492,4 @@ function SettingsPanel({
       </label>
     </section>
   );
-}
-
-function formatTime(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '未扫描';
-  return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-}
-
-function formatExactTime(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '未扫描';
-  return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }

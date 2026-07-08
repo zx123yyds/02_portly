@@ -12,5 +12,6 @@
     "rootDir": ".",
     "types": ["node"]
   },
-  "include": ["electron/**/*.ts", "src/types.ts", "src/lib/ports.ts"]
+  "include": ["electron/**/*.ts", "src/types.ts", "src/lib/ports.ts"],
+  "exclude": ["electron/**/*.test.ts"]
 }

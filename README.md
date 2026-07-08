@@ -62,3 +62,5 @@ npm run dist:mac
 ```
 
 产物会输出到 `release/` 目录。
+
+关于 `.dmg` 体积和 Electron Framework 的说明见 [Portly 安装包体积说明](docs/package-size.md)。

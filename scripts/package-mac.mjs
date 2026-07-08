@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
 
@@ -16,10 +16,12 @@ await mkdir(releaseDir, { recursive: true });
 
 await execFileAsync('ditto', ['node_modules/electron/dist/Electron.app', appPath]);
 await rm(path.join(resourcesPath, 'default_app.asar'), { force: true });
+await pruneElectronRuntime(appPath);
 
 await mkdir(appResourcesPath, { recursive: true });
 await cp('dist', path.join(appResourcesPath, 'dist'), { recursive: true });
 await cp('dist-electron', path.join(appResourcesPath, 'dist-electron'), { recursive: true });
+await removeCompiledTests(path.join(appResourcesPath, 'dist-electron'));
 await cp('assets', path.join(appResourcesPath, 'assets'), { recursive: true });
 await cp('build/icon.icns', path.join(resourcesPath, 'icon.icns'));
 await writeFile(
@@ -69,4 +71,56 @@ console.log(`Created ${zipPath}`);
 
 async function setPlist(plistPath, key, value) {
   await execFileAsync('/usr/libexec/PlistBuddy', ['-c', `Set :${key} ${value}`, plistPath]);
+}
+
+async function pruneElectronRuntime(targetAppPath) {
+  const appResources = path.join(targetAppPath, 'Contents', 'Resources');
+  const frameworkResources = path.join(
+    targetAppPath,
+    'Contents',
+    'Frameworks',
+    'Electron Framework.framework',
+    'Versions',
+    'A',
+    'Resources'
+  );
+  const keptLocales = new Set(['en.lproj', 'en_GB.lproj', 'zh_CN.lproj', 'zh_TW.lproj']);
+
+  await rm(path.join(appResources, 'electron.icns'), { force: true });
+
+  await pruneLocales(appResources, keptLocales);
+  await pruneLocales(frameworkResources, keptLocales);
+}
+
+async function pruneLocales(directory, keptLocales) {
+  let entries = [];
+  try {
+    entries = await readdir(directory, { withFileTypes: true });
+  } catch {
+    return;
+  }
+
+  await Promise.all(
+    entries
+      .filter((entry) => entry.isDirectory() && entry.name.endsWith('.lproj') && !keptLocales.has(entry.name))
+      .map((entry) => rm(path.join(directory, entry.name), { recursive: true, force: true }))
+  );
+}
+
+async function removeCompiledTests(directory) {
+  let entries = [];
+  try {
+    entries = await readdir(directory, { withFileTypes: true });
+  } catch {
+    return;
+  }
+
+  await Promise.all(
+    entries.map((entry) => {
+      const entryPath = path.join(directory, entry.name);
+      if (entry.isDirectory()) return removeCompiledTests(entryPath);
+      if (entry.isFile() && entry.name.endsWith('.test.js')) return rm(entryPath, { force: true });
+      return Promise.resolve();
+    })
+  );
 }

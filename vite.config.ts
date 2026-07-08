@@ -5,7 +5,7 @@ export default defineConfig({
   base: './',
   plugins: [react()],
   test: {
-    exclude: ['node_modules/**', 'dist/**', 'dist-electron/**']
+    exclude: ['node_modules/**', 'dist/**', 'dist-electron/**', 'app/**', 'release/**']
   },
   server: {
     host: '127.0.0.1',

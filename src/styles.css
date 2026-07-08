@@ -50,9 +50,10 @@ button {
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.06) inset;
+  display: flex;
+  flex-direction: column;
   max-height: calc(100vh - 132px);
-  overflow: hidden auto;
-  scrollbar-width: thin;
+  overflow: hidden;
   width: 100%;
 }
 
@@ -143,6 +144,30 @@ button {
   outline: none;
 }
 
+.popover-top,
+.popover-bottom {
+  flex: 0 0 auto;
+}
+
+.popover-top {
+  background: var(--bg);
+  position: relative;
+  z-index: 2;
+}
+
+.popover-bottom {
+  background: var(--bg);
+  position: relative;
+  z-index: 2;
+}
+
+.port-scroll {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow: hidden auto;
+  scrollbar-width: thin;
+}
+
 .settings-view-header {
   padding: 18px 24px 6px;
 }
@@ -169,7 +194,9 @@ button {
 }
 
 .settings-panel {
+  overflow: hidden auto;
   padding: 16px 24px 18px;
+  scrollbar-width: thin;
 }
 
 .settings-field {
@@ -503,6 +530,7 @@ button {
   cursor: pointer;
   padding: 7px 12px;
   transition: background 0.12s;
+  user-select: none;
 }
 
 .row:hover,
@@ -518,7 +546,7 @@ button {
   align-items: center;
   display: grid;
   column-gap: 6px;
-  grid-template-columns: 54px 12px minmax(0, max-content) auto;
+  grid-template-columns: 66px 12px minmax(0, max-content) auto;
   justify-content: start;
 }
 
@@ -528,6 +556,13 @@ button {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
   min-width: 0;
+}
+
+.port small {
+  color: color-mix(in srgb, var(--accent) 78%, var(--muted));
+  font: 600 9px/1 var(--font-body);
+  margin-left: 2px;
+  vertical-align: 0.1em;
 }
 
 .row-disclosure {
@@ -601,6 +636,7 @@ button {
   background: rgba(28, 30, 33, 0.92);
   border-radius: 5px;
   color: #ffffff;
+  display: none;
   font-family: var(--font-body);
   font-size: 10px;
   font-weight: 600;
@@ -620,6 +656,7 @@ button {
 
 .metric-tip:hover .metric-tip-label,
 .metric-tip:focus-visible .metric-tip-label {
+  display: block;
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
@@ -651,6 +688,13 @@ button {
   width: 26px;
 }
 
+.action-spacer {
+  display: block;
+  flex: 0 0 26px;
+  height: 26px;
+  width: 26px;
+}
+
 .row.confirming-kill .row-actions {
   gap: 6px;
   opacity: 1;
@@ -662,6 +706,51 @@ button {
   color: var(--danger);
 }
 
+.port-chip-row {
+  padding-bottom: 9px;
+}
+
+.port-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 7px 24px 0 84px;
+  min-width: 0;
+}
+
+.port-chip {
+  background: rgba(21, 191, 128, 0.1);
+  border: 1px solid rgba(21, 191, 128, 0.24);
+  border-radius: 999px;
+  color: #0f9465;
+  cursor: default;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  height: 22px;
+  line-height: 1;
+  min-width: 48px;
+  padding: 0 7px;
+  justify-content: center;
+}
+
+.theme-dark .port-chip {
+  background: rgba(34, 197, 136, 0.14);
+  border-color: rgba(34, 197, 136, 0.24);
+  color: #6fe0b0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme-system .port-chip {
+    background: rgba(34, 197, 136, 0.14);
+    border-color: rgba(34, 197, 136, 0.24);
+    color: #6fe0b0;
+  }
+}
+
 .action-tip {
   position: relative;
 }
@@ -670,6 +759,7 @@ button {
   background: rgba(28, 30, 33, 0.92);
   border-radius: 5px;
   color: #ffffff;
+  display: none;
   font-family: var(--font-body);
   font-size: 10px;
   font-weight: 600;
@@ -689,6 +779,7 @@ button {
 
 .action-tip:hover .action-tip-label,
 .action-tip:focus-visible .action-tip-label {
+  display: block;
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
@@ -724,6 +815,7 @@ button {
   font-size: 11px;
   min-width: 0;
   overflow-wrap: anywhere;
+  user-select: text;
   white-space: normal;
 }
 
@@ -751,6 +843,12 @@ button {
 
 .toggle-btn:hover {
   color: var(--fg);
+}
+
+.toggle-btn em {
+  color: color-mix(in srgb, var(--muted) 72%, transparent);
+  font-style: normal;
+  margin-left: auto;
 }
 
 .toggle-btn::before {
@@ -976,7 +1074,12 @@ button {
 
   .row-main {
     column-gap: 6px;
-    grid-template-columns: 58px 13px minmax(0, 1fr) auto;
+    grid-template-columns: 66px 13px minmax(0, 1fr) auto;
+  }
+
+  .port-chips {
+    margin-left: 85px;
+    margin-right: 18px;
   }
 
   .row {

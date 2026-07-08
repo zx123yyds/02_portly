@@ -92,16 +92,18 @@ async function hydrateProcessDetails(ports: PortEntry[]): Promise<PortEntry[]> {
         const packageName = await readPackageName(cwd);
         const lsofCommand = ports.find((port) => port.pid === pid)?.command ?? '';
         const command = preferReliableCommand(lsofCommand, parsed.command);
+        const args = parsed.args ?? '';
+        const displayPath = displayPathFromContext({ command, cwd, args });
         const projectName = inferProjectNameFromContext({
           command,
-          cwd,
+          cwd: displayPath,
           packageName,
-          args: parsed.args ?? ''
+          args
         });
         details.set(pid, {
           ...parsed,
           command,
-          cwd,
+          cwd: displayPath,
           name: projectName,
           project: projectName
         });
@@ -207,6 +209,20 @@ export function inferProjectNameFromContext({ command, cwd, packageName, args }:
   return command || 'Unknown';
 }
 
+export function displayPathFromContext({ command, cwd, args }: { command: string; cwd: string; args: string }): string {
+  const appPath = appBundlePathFromArgs(args);
+  if (!isGenericCommand(command) && appPath) return appPath;
+
+  if (usefulFolderName(cwd)) return cwd;
+
+  if (appPath) return appPath;
+
+  const userDataDir = pathValueFromArgs(args, '--user-data-dir');
+  if (userDataDir) return userDataDir;
+
+  return cwd || '未知';
+}
+
 function usefulNameFromArgs(args: string): string | null {
   const extensionMatch = args.match(/\/\.vscode\/extensions\/([^/\s]+?)-\d/i);
   if (extensionMatch) return extensionMatch[1];
@@ -219,6 +235,22 @@ function usefulNameFromArgs(args: string): string | null {
     if (base && !isGenericCommand(base) && base !== 'bin') return base;
   }
   return null;
+}
+
+function pathValueFromArgs(args: string, key: string): string | null {
+  const start = args.indexOf(`${key}=`);
+  if (start === -1) return null;
+
+  const valueStart = start + key.length + 1;
+  let nextOption = args.indexOf(' --', valueStart);
+  if (nextOption === -1) nextOption = args.length;
+  const value = args.slice(valueStart, nextOption).trim();
+  return value || null;
+}
+
+function appBundlePathFromArgs(args: string): string | null {
+  const match = args.match(/(\/Applications\/.*?\.app)(?:\/|\s|$)/);
+  return match?.[1] ?? null;
 }
 
 function isGenericCommand(command: string): boolean {
