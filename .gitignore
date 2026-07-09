@@ -5,8 +5,7 @@ dist/
 dist-electron/
 app/
 release/
-artifacts/*ui-comparison*.html
-artifacts/screenshots/
+artifacts/
 docs/port-data-flow.md
 docs/project-retrospective.md
 docs/release-policy.md
