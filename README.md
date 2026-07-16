@@ -2,6 +2,10 @@
 
 Portly 是一个小巧的 macOS 菜单栏应用，用于快速查看本机正在监听的端口，并支持在浏览器、终端中打开对应服务或结束进程。
 
+<p align="center">
+  <img src="docs/assets/portly-overview.png" alt="Portly 菜单栏端口列表界面" width="480">
+</p>
+
 ## 普通用户安装
 
 在 GitHub Releases 下载最新版：
